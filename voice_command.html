@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jarvis Assistant</title>
+    <style>
+        .ripple-animation {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            background: rgba(0, 150, 255, 0.3);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.6s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .ripple-active {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 1;
+        }
+
+        :root {
+        --plt1: #3361ac;
+        --plt2: #e7e6dd;
+        --plt3: #e8c766;
+        --plt4: #e8af30;
+        --plt5: #162f65;
+        --plt6: #0f2043;
+        }
+
+        body {
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        background-color: #eee;
+        position: relative;
+        }
+
+        button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background-color: var(--plt5);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        z-index: 10;
+        }
+
+        .circle-container {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        /* filter: blur(8px); */
+        opacity: 0.2;
+        transform: scale(0.8);
+        transition: none; /* We'll animate manually using keyframes */
+        }
+
+        .circle-container.active {
+        animation: moveToCenter 0.8s ease-in-out forwards;
+        }
+
+        @keyframes moveToCenter {
+        0% {
+            transform: translate(0, 0) scale(0.8);
+            opacity: 0.2;
+        }
+        100% {
+            transform: translate(-50vw, -50vh) scale(1);
+            opacity: 1;
+        }
+        }
+
+        @keyframes moveOut {
+            from {
+                bottom: 50%;
+                right: 50%;
+                transform: translate(50%, 50%) scale(1);
+                opacity: 1;
+            }
+            to {
+                bottom: 20px;
+                right: 20px;
+                transform: scale(0.8);
+                opacity: 0.2;
+            }
+        }
+
+
+        .circle {
+        position: absolute;
+        border-radius: 50%;
+        }
+
+        .circle1 {
+        width: 75px;
+        height: 75px;
+        background-color: var(--plt5);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: float1 1.5s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        .circle2 {
+        width: 65px;
+        height: 65px;
+        background-color: var(--plt4);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: float2 1.9s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        .circle3 {
+        width: 50px;
+        height: 50px;
+        background-color: var(--plt1);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: float3 2s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        .circle4 {
+        width: 35px;
+        height: 35px;
+        background-color: var(--plt3);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: float4 2.5s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+        0%, 100% { box-shadow: 0 0 10px var(--plt1), 0 0 20px var(--plt1); opacity: 0.8; }
+        50% { box-shadow: 0 0 20px var(--plt1), 0 0 40px var(--plt1); opacity: 1; }
+        }
+
+        @keyframes float1 {
+        0% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        20% { transform: translate(-50%, -50%) translate(8px, -5px) scale(1.1, 0.9) rotate(5deg); }
+        40% { transform: translate(-50%, -50%) translate(-6px, 6px) scale(0.9, 1.1) rotate(-5deg); }
+        60% { transform: translate(-50%, -50%) translate(4px, -8px) scale(1.05, 0.95) rotate(3deg); }
+        80% { transform: translate(-50%, -50%) translate(10px, 6px) scale(0.95, 1.05) rotate(-3deg); }
+        100% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        }
+
+        @keyframes float2 {
+        0% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        20% { transform: translate(-50%, -50%) translate(-6px, 6px) scale(1.1, 0.9) rotate(-4deg); }
+        40% { transform: translate(-50%, -50%) translate(5px, -5px) scale(0.9, 1.1) rotate(4deg); }
+        60% { transform: translate(-50%, -50%) translate(-4px, 7px) scale(1.05, 0.95) rotate(-3deg); }
+        80% { transform: translate(-50%, -50%) translate(3px, -4px) scale(0.95, 1.05) rotate(3deg); }
+        100% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        }
+
+        @keyframes float3 {
+        0% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        20% { transform: translate(-50%, -50%) translate(7px, -7px) scale(1.1, 0.9) rotate(6deg); }
+        40% { transform: translate(-50%, -50%) translate(9px, 9px) scale(0.9, 1.1) rotate(-6deg); }
+        60% { transform: translate(-50%, -50%) translate(6px, -6px) scale(1.05, 0.95) rotate(4deg); }
+        80% { transform: translate(-50%, -50%) translate(-3px, 3px) scale(0.95, 1.05) rotate(-4deg); }
+        100% { transform: translate(-50%, -50%) translate(0px, 0px) scale(1) rotate(0deg); }
+        }
+
+        @keyframes float4 {
+        0% { transform: translate(-50%, -50%) translate(0px, 0px); }
+        25% { transform: translate(-50%, -50%) translate(5px, 5px); }
+        50% { transform: translate(-50%, -50%) translate(5px, 0px); }
+        75% { transform: translate(-50%, -50%) translate(0px, 5px); }
+        100% { transform: translate(-50%, -50%) translate(0px, 0px); }
+        }
+    </style>
+</head>
+<body>
+    <h2>🎙️ Say "Hello Jarvis" then "start recording"</h2>
+    <p id="status">⏳ Waiting for wake word...</p>
+    <div id="circleContainer" class="circle-container">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+    </div>
+    <p id="log"></p>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+
+        // Can remove later
+        recognition.continuous = true;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        recognition.onend = () => {
+            console.log("🔁 Speech recognition ended. Restarting...");
+            recognition.start();
+        };
+
+
+        const intentMap = {
+            "start_meeting": ["start meeting", "begin meeting", "initiate session", "stuck meeting"],
+            "stop_meeting": ["stop meeting", "end meeting", "end session", "close meeting"],
+            "start_recording": ["start recording",  "start the recording", "begin recording", "begin record","record now", "start record", "start recoding", "start recording now",],
+            "stop_recording": ["stop recording", "stop the recording", "stop record", "end recording", "end the recording", "finish recording", "stop recoding",],
+            "open_calendar": ["open calendar", "show calendar", "what's on my schedule", "my schedule"],
+            "summarize_meeting": ["summarize meeting", "make summary", "meeting summary", "summarize this meeting", "summarize it", "give me a summary", "generate summary", "get summary",
+                                    "summarize meetings", "meetings summary", "summarize this meetings",],    
+            "help_command": ["what can i say", "help", "show commands", "list commands", "command list"],
+            "close_jarvis": ["goodbye", "bye", "end system", "turn off"],
+        };
+
+        const wakeWordCorrections = {
+            "jarvis": "hello jarvis", "jervin": "hello jarvis", "jervis": "hello jarvis", "service": "hello jarvis",
+            "hello jarvis": "hello jarvis", "hello jervin": "hello jarvis", "hello jervis": "hello jarvis", "hello service": "hello jarvis", 
+            "halo jarvis": "hello jarvis", "halo jervin": "hello jarvis", "halo jervis": "hello jarvis", "halo service": "hello jarvis", 
+            "hey jarvis": "hello jarvis", "hey jervin": "hello jarvis", "hey jervis": "hello jarvis", "hey service": "hello jarvis", 
+            "hi jarvis": "hello jarvis", "hi jervin": "hello jarvis", "hi jervis": "hello jarvis", "hi service": "hello jarvis", 
+            "high jarvis": "hello jarvis", "high jervin": "hello jarvis", "high jervis": "hello jarvis", "high service": "hello jarvis", 
+            "i jarvis": "hello jarvis", "i jervin": "hello jarvis", "i jervis": "hello jarvis", "i service": "hello jarvis", 
+            "yo jarvis": "hello jarvis", "yo jervin": "hello jarvis", "yo jervis": "hello jarvis", "yo service": "hello jarvis",
+            "hsr": "hello jarvis", "hrs": "hello jarvis", "hms": "hello jarvis"
+        };
+
+        function applyWakeCorrections(text, corrections) {
+            const words = text.split(" ");
+            let foundWake = null;
+
+            const cleanedWords = words.map(word => {
+                if (corrections[word]) {
+                    foundWake = corrections[word]; // only store the mapped canonical form
+                    return null; // remove the variant
+                }
+                return word;
+            }).filter(Boolean); // remove nulls
+
+            if (foundWake) {
+                // Prepend wake word once at the start
+                return `${foundWake} ${cleanedWords.join(" ")}`.trim();
+            }
+
+            return text; // no correction needed
+        }
+
+        function normalizeWakeWord(transcript) {
+            for (const [variant, canonical] of Object.entries(wakeWordCorrections)) {
+                if (transcript.includes(variant)) return canonical;
+            }
+            return null;
+        }
+
+        function findIntent(transcript) {
+            for (const [intentKey, phrases] of Object.entries(intentMap)) {
+                for (const phrase of phrases) {
+                    if (transcript.includes(phrase)) {
+                        return intentKey; // <-- returns "start recording"
+                    }
+                }
+            }
+            return null;
+        }
+
+
+        function getIntentFromPhrase(phrase) {
+            for (const [intent, phrases] of Object.entries(intentMap)) {
+                if (phrases.includes(phrase)) return intent;
+            }
+            return null;
+        }
+
+        function detectWakeAndIntentTogether(transcript, wake, phrase) {
+            const wakeIndex = transcript.indexOf(wake);
+            const cmdIndex = transcript.indexOf(phrase);
+            return wakeIndex > -1 && cmdIndex > -1 && wakeIndex < cmdIndex;
+        }
+
+        function generateHelpText(intentMap) {
+            let helpText = "🧠 Available commands:\n";
+            for (const [intent, phrases] of Object.entries(intentMap)) {
+                // Display the intent or the first example phrase
+                const example = phrases[0] || intent;
+                helpText += `- "${example}"\n`;
+            }
+            return helpText;
+        }
+
+        function handleIntent(intent) {
+            if (intent === "start_meeting") {
+                statusEl.textContent = "📝 Meeting started!";
+                logEl.innerHTML += `<p>✅ Meeting started at ${new Date().toLocaleTimeString()}</p>`;
+                // Call your meeting-start function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "stop_meeting") {
+                statusEl.textContent = "📝 Meeting ended!";
+                logEl.innerHTML += `<p>✅ Meeting ended at ${new Date().toLocaleTimeString()}</p>`;
+                // Call your meeting-stop function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "start_recording") {
+                statusEl.textContent = "Recording start!";
+                logEl.innerHTML += `<p>✅ Recording started at ${new Date().toLocaleTimeString()}</p>`;
+                // Call your recording-start function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "stop_recording") {
+                statusEl.textContent = "📝 Recording ended!";
+                // recomendation inform user where the recording is saved
+                logEl.innerHTML += `<p>✅ Recording ended at ${new Date().toLocaleTimeString()}</p>`;
+                // Call your recording-stop function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "open_calendar") {
+                statusEl.textContent = "📝 Open calender!";
+                // show actual calender
+                logEl.innerHTML += `<p>✅ Calender</p>`;
+                // Call your calender function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "summarize_meeting") {
+                statusEl.textContent = "📝 Summarize transcription!";
+                // show summarization
+                logEl.innerHTML += `<p>✅ Summarize transcription. </p>`;
+                // Call your summarize function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "help_command") {
+                const helpText = generateHelpText(intentMap);
+                statusEl.textContent = "📋 Help: Listing available commands";
+                // show summarization
+                logEl.innerHTML += `<pre>${helpText}</pre>`;
+                // Call your help function here
+                resetPosition();
+                isCommandMode = false;
+                return;
+            }
+
+            if (intent === "close_jarvis") {
+                statusEl.textContent = "🛑 Jarvis is now sleeping.";
+                document.body.style.opacity = "0.5";
+                resetPosition();
+                recognition.stop();
+                return;
+            }
+
+           else {
+                console.log(`⚠️ Intent "${intent}" not handled yet.`);
+                return;
+            }
+            // Add other intents here...
+        }
+
+
+        // Case 1
+        function handleWakeAndIntentTogether(wakeDetected, intentPhrase, transcript) {
+            if (detectWakeAndIntentTogether(transcript, wakeDetected, intentPhrase)) {
+                const intent = getIntentFromPhrase(intentPhrase);
+
+                statusEl.textContent = `✅ Wake + Command: ${intent}`;
+                logEl.innerHTML += `<p>🧠 Detected both: <strong>${wakeDetected}</strong> → <strong>${intent}</strong></p>`;
+                
+                handleIntent(intent);
+                isCommandMode = false;
+                return true;
+            }
+            return false;
+        }
+
+        let isCommandMode = false;
+        let lastWakeTimestamp = 0;
+        let commandAttemptsLeft = 0;
+        let suggestedCommand = null;
+        let awaitingConfirmation = false;
+
+        recognition.onresult = (event) => {
+            const result = event.results[event.results.length - 1][0];
+            const transcript = result.transcript.trim().toLowerCase();
+            const confidence = result.confidence;
+
+            if (confidence < 0.7 || transcript.length < 3) return;
+
+            console.log("🎧 Heard:", transcript);
+
+            // 🔧 Apply corrections FIRST
+            const correctedTranscript = applyWakeCorrections(transcript, wakeWordCorrections);
+            
+            console.log("🛠️ Corrected:", correctedTranscript);
+            
+            const wakeDetected = normalizeWakeWord(correctedTranscript); // Uses your `wakeWordCorrections`
+            const intent = findIntent(correctedTranscript);              // Still use original transcript to detect command
+
+
+            // 🔁 CASE 0: Awaiting confirmation
+            if (awaitingConfirmation) {
+                if (transcript.includes("yes")) {
+                    const confirmedIntent = getIntentFromPhrase(suggestedCommand);
+                    handleIntent(confirmedIntent);
+                    resetPosition();
+                    isCommandMode = false;
+                    awaitingConfirmation = false;
+                    suggestedCommand = null;
+                    return;
+                }          
+
+                // Try to detect a new valid command instead of just rejecting
+                const intent = findIntent(transcript);
+                if (intent) {
+                    // speak(`Okay, executing ${transcript}`);
+                    statusEl.textContent = `✅ New Command: ${intent}`;
+                    logEl.innerHTML += `<p>🆕 User gave a new command instead: <strong>${intent}</strong></p>`;
+
+                    handleIntent(intent);
+                    isCommandMode = false;
+                    awaitingConfirmation = false;
+                    suggestedCommand = null;
+                    resetPosition()
+                    return;
+                }
+
+                // Still unrecognized
+                // speak("❌ Not confirmed. Please try again.");
+                statusEl.textContent = "❌ Not confirmed. Please try again.";
+                awaitingConfirmation = false;
+                suggestedCommand = null;
+            }
+
+            // ✅ Case 1: Wake + Intent in one sentence
+            if (wakeDetected && intent && handleWakeAndIntentTogether(wakeDetected, intent, correctedTranscript)) {
+                return;
+            }
+
+            // Case 2: Wake word only
+            if (wakeDetected && !isCommandMode) {
+
+                const now = Date.now();
+                if (now - lastWakeTimestamp < 2000) return; // To avoid detecting wake words after wake detected
+
+                moveToCenter();
+                console.log(`🔔 Wake word triggered by: "${wakeDetected}"`);
+                statusEl.textContent = `✅ Wake word "${wakeDetected}" detected! Listening for up to 3 commands...`;
+                lastWakeTimestamp = Date.now();
+                isCommandMode = true;
+                commandAttemptsLeft = 3;
+                return;
+            }
+
+            // ✅ Case 3: Command after wake word
+            if (intent && isCommandMode) {
+                if (intent === "start_meeting" && !awaitingConfirmation) {
+                    statusEl.textContent = `🧐 Are you sure you want to start the meeting? Say "yes" to confirm.`;
+                    suggestedCommand = "start meeting";
+                    awaitingConfirmation = true;
+                    return;
+                }
+
+                // ✅ Use your centralized handler here
+                handleIntent(intent);
+                isCommandMode  = false;
+                return;
+            }
+
+            // ✅ Case 4: No command match, but still in command mode
+            if (isCommandMode && !intent && !awaitingConfirmation) {
+                const elapsed = (Date.now() - lastWakeTimestamp) / 1000;
+
+                // Timeout after 30 seconds
+                if (elapsed > 30) {
+                    statusEl.textContent = `⌛ Timeout! Say "Hello Jarvis" again.`;
+                    isCommandMode = false;
+                    commandAttemptsLeft = 0;
+                    resetPosition();
+                    return;
+                }
+
+                // Attempt to guess user intent
+                const allCommandPhrases = Object.values(intentMap).flat();
+                const guess = findClosestCommand(transcript, allCommandPhrases);
+
+                if (guess) {
+                    statusEl.textContent = `🤔 Did you mean "${guess}"? Say "yes" to confirm.`;
+                    suggestedCommand = guess;
+                    awaitingConfirmation = true;
+                    return;
+                }
+
+                console.log("👂 Unclear or random input:", transcript);
+
+                // Decrement attempts only for longer phrases
+                const wordCount = transcript.trim().split(/\s+/).length;
+                if (wordCount > 1) {
+                    commandAttemptsLeft--;
+                    console.log("Command attempts left:", commandAttemptsLeft);
+
+                    if (commandAttemptsLeft > 0) {
+                        statusEl.textContent = `❌ Unrecognized command. ${commandAttemptsLeft} tries left...`;
+                    } else {
+                        statusEl.textContent = `🔁 3 failed attempts. Returning to wake mode.`;
+                        isCommandMode = false;
+                        resetPosition();
+                    }
+                } else {
+                    console.log("🛑 Ignored short/noisy input.");
+                }
+            }
+        };
+
+        function findClosestCommand(input, commandList, threshold = 0.6) {
+            let bestMatch = null;
+            let highestScore = 0;
+
+            for (let command of commandList) {
+                const score = stringSimilarity(input, command); // You’ll define this below
+                if (score > highestScore && score >= threshold) {
+                highestScore = score;
+                bestMatch = command;
+                }
+            }
+
+            return bestMatch;
+        }
+
+        // To find similiraty in the string
+        function stringSimilarity(a, b) {
+            a = a.toLowerCase();
+            b = b.toLowerCase();
+
+            if (a === b) return 1;
+            const longer = a.length > b.length ? a : b;
+            const shorter = a.length > b.length ? b : a;
+
+            const longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+
+            const editDist = levenshteinDistance(longer, shorter);
+            return (longerLength - editDist) / parseFloat(longerLength);
+        }
+
+        function levenshteinDistance(a, b) {
+            const matrix = Array(a.length + 1).fill(null).map(() =>
+                Array(b.length + 1).fill(null)
+            );
+
+            for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+            for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1,      // deletion
+                        matrix[i][j - 1] + 1,      // insertion
+                        matrix[i - 1][j - 1] + cost // substitution
+                    );
+                }
+            }
+
+            return matrix[a.length][b.length];
+        }
+
+        function moveToCenter() {
+            document.getElementById('circleContainer').classList.add('active');
+        }
+
+        function resetPosition() {
+            const el = document.getElementById('circleContainer');
+            el.style.animation = 'moveOut 0.8s ease-in-out forwards';
+
+            // After animation ends, remove "active" class and reset animation
+            setTimeout(() => {
+                el.classList.remove('active');
+                el.style.animation = '';
+            }, 800); // match animation duration
+        }
+
+        recognition.onerror = (event) => {
+            statusEl.textContent = "❌ Error: " + event.error;
+        };
+
+        recognition.start();
+    </script>
+</body>
+</html>
